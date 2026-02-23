@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnpm-store
+.npm
+
+# Build
+dist/
+build/
+coverage/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# OS
+Thumbs.db
+
+# Project Specific
+backend/db/
+backend/prisma.config.ts
+APi.txt
+metadata.json
+
+

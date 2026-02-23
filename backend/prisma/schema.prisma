@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 1. User Model (Enhanced Security)
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  passwordHash   String
+  phone          String?
+  // Lockout Mechanism
+  failedAttempts Int       @default(0)
+  lockUntil      DateTime?
+  accountLocked  Boolean   @default(false)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  devices       Device[]
+  otpChallenges OTPChallenge[]
+  biometrics    BiometricEmbedding[]
+  auditLogs     AuditLog[]
+  sessions      AuthSession[]
+  activeSessions Session[]
+
+  // Legacy/Extensions
+  role String @default("USER")
+}
+
+// 2. OTP Challenge Engine
+model OTPChallenge {
+  id        String   @id @default(uuid())
+  userId    String
+  otpHash   String // hashed for security
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// 3. Device Trust & Fingerprinting
+model Device {
+  id         String   @id @default(uuid())
+  userId     String
+  deviceId   String // Fingerprint Hash
+  userAgent  String
+  trustScore Float    @default(0.5)
+  firstSeen  DateTime @default(now())
+  lastSeen   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// 4. Biometric Data (Vector/Embedding Storage)
+model BiometricEmbedding {
+  id        String   @id @default(uuid())
+  userId    String
+  // type      String   @default("FACE") // Reverted due to DB push failure
+  embedding Json // Storing vector as JSON array
+  version   String // To support model upgrades
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// 5. Immutable Audit Log
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  eventType String // LOGIN_SUCCESS, LOGIN_FAILED, LOCKOUT, etc.
+  ipAddress String?
+  riskScore Float?
+  decision  String? // ALLOW, CHALLENGE, BLOCK
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+// 6. Auth Session (Refresh Tokens & Risk Context)
+model AuthSession {
+  id               String    @id @default(uuid())
+  userId           String
+  refreshTokenHash String?
+  ipAddress        String?
+  deviceInfo       String?
+  riskScore        Float?
+  mfaRequired      Boolean   @default(false)
+  isSuccessful     Boolean   @default(false)
+  expiresAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// 7. Active Session Monitoring (Phase 4)
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique // Session Token (JWT signature or UUID)
+  active    Boolean  @default(true)
+  lastActive DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}

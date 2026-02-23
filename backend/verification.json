@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Standard Legitimate User (Password + Device + IP)",
+    "input": {
+      "passwordValid": true,
+      "otpValid": false,
+      "biometricScore": 0,
+      "deviceTrust": 0.9,
+      "ipRisk": 0.9,
+      "failedAttempts": 0
+    },
+    "score": 0.53,
+    "decision": "DENY",
+    "breakdown": {
+      "password": 0.3,
+      "otp": 0,
+      "biometric": 0,
+      "device": 0.09000000000000001,
+      "ip": 0.09000000000000001,
+      "behavior": 0.05
+    }
+  },
+  {
+    "name": "Full Security User (Pass + OTP + Bio + Device + IP)",
+    "input": {
+      "passwordValid": true,
+      "otpValid": true,
+      "biometricScore": 0.9,
+      "deviceTrust": 1,
+      "ipRisk": 1,
+      "failedAttempts": 0
+    },
+    "score": 0.97,
+    "decision": "ALLOW",
+    "breakdown": {
+      "password": 0.3,
+      "otp": 0.2,
+      "biometric": 0.225,
+      "device": 0.1,
+      "ip": 0.1,
+      "behavior": 0.05
+    }
+  },
+  {
+    "name": "Attacker (Password Only, New Device, Bad IP)",
+    "input": {
+      "passwordValid": true,
+      "otpValid": false,
+      "biometricScore": 0,
+      "deviceTrust": 0,
+      "ipRisk": 0.1,
+      "failedAttempts": 0
+    },
+    "score": 0.36,
+    "decision": "DENY",
+    "breakdown": {
+      "password": 0.3,
+      "otp": 0,
+      "biometric": 0,
+      "device": 0,
+      "ip": 0.010000000000000002,
+      "behavior": 0.05
+    }
+  },
+  {
+    "name": "Brute Force Attempt (Password, High Failures)",
+    "input": {
+      "passwordValid": true,
+      "otpValid": false,
+      "biometricScore": 0,
+      "deviceTrust": 0,
+      "ipRisk": 0.5,
+      "failedAttempts": 5
+    },
+    "score": 0.35,
+    "decision": "DENY",
+    "breakdown": {
+      "password": 0.3,
+      "otp": 0,
+      "biometric": 0,
+      "device": 0,
+      "ip": 0.05,
+      "behavior": 0
+    }
+  },
+  {
+    "name": "Step-Up Scenario (Pass + OTP + Device)",
+    "input": {
+      "passwordValid": true,
+      "otpValid": true,
+      "biometricScore": 0,
+      "deviceTrust": 0.9,
+      "ipRisk": 0.9,
+      "failedAttempts": 0
+    },
+    "score": 0.73,
+    "decision": "STEP_UP",
+    "breakdown": {
+      "password": 0.3,
+      "otp": 0.2,
+      "biometric": 0,
+      "device": 0.09000000000000001,
+      "ip": 0.09000000000000001,
+      "behavior": 0.05
+    }
+  }
+]
